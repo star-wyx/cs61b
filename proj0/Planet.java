@@ -38,8 +38,6 @@ public class Planet {
         double dist = calcDistance(p);
         double force = calcForceExertedBy(p);
         double xdist = p.xxPos - this.xxPos;
-        if (xdist < 0)
-            xdist = -xdist;
         return xdist / dist * force;
     }
 
@@ -47,8 +45,6 @@ public class Planet {
         double dist = calcDistance(p);
         double force = calcForceExertedBy(p);
         double ydist = p.yyPos - this.yyPos;
-        if (ydist < 0)
-            ydist = -ydist;
         return ydist / dist * force;
     }
 
