@@ -34,7 +34,6 @@ public class NBody {
         }
 
         for (double t = 0; t < T; t += dt) {
-            System.out.println("one");
             double[] xForces = new double[length];
             double[] yForces = new double[length];
             for (int i = 0; i < length; i++) {
