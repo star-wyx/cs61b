@@ -8,6 +8,7 @@
 .class
 .idea
 library-sp18-master
+out
 *.log
 *.ctxt
 .mtj.tmp/
