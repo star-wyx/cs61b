@@ -1,9 +1,9 @@
 public class ArrayDeque<T> {
 
-    T[] array;
-    int size;
-    int nextFirst;
-    int nextLast;
+    private T[] array;
+    private int size;
+    private int nextFirst;
+    private int nextLast;
 
     public ArrayDeque() {
         size = 0;
@@ -12,21 +12,23 @@ public class ArrayDeque<T> {
         nextLast = 4;
     }
 
-    public int next(int x) {
-        if (x == array.length - 1)
+    private int next(int x) {
+        if (x == array.length - 1) {
             return 0;
-        else
+        } else {
             return x + 1;
+        }
     }
 
-    public int pre(int x) {
-        if (x == 0)
+    private int pre(int x) {
+        if (x == 0) {
             return array.length - 1;
-        else
+        } else {
             return x - 1;
+        }
     }
 
-    public void resize(int x) {
+    private void resize(int x) {
         T[] tmp = (T[]) new Object[x];
         int start = (x - size) / 2;
         int end = start + size - 1;
@@ -38,22 +40,13 @@ public class ArrayDeque<T> {
         nextFirst = start - 1;
         nextLast = end + 1;
         array = tmp;
-//        if (nextFirst <= nextLast) {
-//            System.arraycopy(array, next(nextFirst), tmp, (x - size) / 2, size);
-//            nextFirst = (x - size) / 2 - 1;
-//            nextLast = nextFirst + size + 1;
-//            array = tmp;
-//        } else {
-//            T[] t = (T[]) new Object[size];
-//            System.arraycopy(array, next(nextFirst), t, 0, array.length - next(nextFirst));
-//        }
     }
 
-    public void check() {
+    private void check() {
         if (nextFirst == nextLast) {
-            resize(size * 2);
+            resize((int) (size * 1.5));
         } else if (size >= 16 && ((double) size / array.length < 0.25)) {
-            resize(size * 2);
+            resize((int) (array.length*0.5));
         }
     }
 
@@ -83,9 +76,9 @@ public class ArrayDeque<T> {
         int head = next(nextFirst);
         int tail = pre(nextLast);
 
-        if (size == 0)
+        if (size == 0) {
             System.out.println("");
-        else {
+        } else {
             while (head != tail) {
                 System.out.print(array[head] + " ");
                 head = next(head);
@@ -111,8 +104,9 @@ public class ArrayDeque<T> {
     }
 
     public T removeFirst() {
-        if(size==0)
+        if (size == 0) {
             return null;
+        }
         int head = next(nextFirst);
         T tmp = array[head];
         array[head] = null;
@@ -123,8 +117,9 @@ public class ArrayDeque<T> {
     }
 
     public T removeLast() {
-        if(size==0)
+        if (size == 0) {
             return null;
+        }
         int tail = pre(nextLast);
         T tmp = array[tail];
         array[tail] = null;
@@ -135,8 +130,9 @@ public class ArrayDeque<T> {
     }
 
     public T get(int index) {
-        if (size == 0 || index >= size)
+        if (size == 0 || index >= size) {
             return null;
+        }
         int cur = next(nextFirst);
         int tmp = index;
         while (tmp != 0) {
