@@ -46,7 +46,7 @@ public class ArrayDeque<T> {
         if (nextFirst == nextLast) {
             resize((int) (size * 1.5));
         } else if (size >= 16 && ((double) size / array.length < 0.25)) {
-            resize((int) (array.length*0.5));
+            resize((int) (array.length * 0.5));
         }
     }
 

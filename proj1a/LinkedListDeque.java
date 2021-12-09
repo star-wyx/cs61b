@@ -69,7 +69,7 @@ public class LinkedListDeque<T> {
             dummy.next = null;
         }
         size -= 1;
-        if(dummy.pre!=null){
+        if (dummy.pre != null) {
             dummy.pre.pre = null;
         }
         return first.item;
@@ -85,7 +85,7 @@ public class LinkedListDeque<T> {
             dummy.pre = null;
         }
         size -= 1;
-        if(dummy.next!=null) {
+        if (dummy.next != null) {
             dummy.next.next = null;
         }
         return last.item;
