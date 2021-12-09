@@ -28,7 +28,7 @@ public class TestArrayDequeGold {
                 ads.addLast(i);
                 s++;
                 msg.append("addLast(" + i + ")\n");
-                assertEquals(msg.toString(), ads.get(s - 1), sad.get(s - 1));
+                assertEquals(msg.toString(), ads.get(ads.size() - 1), sad.get(sad.size() - 1));
             } else if (selector < 0.75) {
                 if (ads.isEmpty()) {
                     msg.append("isEmpty()\n");
