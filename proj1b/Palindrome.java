@@ -20,11 +20,11 @@ public class Palindrome {
         return true;
     }
 
-    public boolean isPalindrome(String word, CharacterComparator cc){
+    public boolean isPalindrome(String word, CharacterComparator cc) {
         Deque<Character> l = wordToDeque(word);
         int size = l.size();
         while (size != 0 && size != 1) {
-            if (!cc.equalChars(l.removeFirst(),l.removeLast())) {
+            if (!cc.equalChars(l.removeFirst(), l.removeLast())) {
                 return false;
             }
             size -= 2;
