@@ -22,12 +22,17 @@ public class Palindrome {
 
     public boolean isPalindrome(String word, CharacterComparator cc) {
         Deque<Character> l = wordToDeque(word);
-        int size = l.size();
-        while (size != 0 && size != 1) {
-            if (!cc.equalChars(l.removeFirst(), l.removeLast())) {
+//        int size = l.size();
+//        while (size != 0 && size != 1) {
+//            if (!cc.equalChars(l.removeFirst(), l.removeLast())) {
+//                return false;
+//            }
+//            size -= 2;
+//        }
+        while(l.size()>1){
+            if(!cc.equalChars(l.removeFirst(),l.removeLast())){
                 return false;
             }
-            size -= 2;
         }
         return true;
     }
