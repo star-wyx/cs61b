@@ -12,6 +12,35 @@ public class ArrayRingBuffer<T>  extends AbstractBoundedQueue<T>{
     /* Array for storing the buffer data. */
     private T[] rb;
 
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayIterator();
+    }
+
+    private class ArrayIterator implements Iterator{
+
+        int size;
+        int t;
+
+        public ArrayIterator() {
+            this.size = 0;
+            this.t = first;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return size < fillCount;
+        }
+
+        @Override
+        public T next() {
+            T tmp = rb[t];
+            size++;
+            t = (t == capacity-1)? 0: t+1;
+            return tmp;
+        }
+    }
+
     /**
      * Create a new ArrayRingBuffer with the given capacity.
      */
@@ -43,6 +72,9 @@ public class ArrayRingBuffer<T>  extends AbstractBoundedQueue<T>{
      */
     public void enqueue(T x) {
         // TODO: Enqueue the item. Don't forget to increase fillCount and update last.
+        if(isFull()){
+            throw new RuntimeException("Ring buffer overflow");
+        }
         rb[nextLast] = x;
         if(fillCount==0){
             first = nextLast;
@@ -57,7 +89,10 @@ public class ArrayRingBuffer<T>  extends AbstractBoundedQueue<T>{
      * covered Monday.
      */
     public T dequeue() {
-        // TODO: Dequeue the first item. Don't forget to decrease fillCount and update 
+        // TODO: Dequeue the first item. Don't forget to decrease fillCount and update
+        if(isEmpty()){
+            throw new RuntimeException("Ring buffer underflow");
+        }
         T tmp = rb[first];
         rb[first] = null;
         fillCount--;
@@ -70,6 +105,9 @@ public class ArrayRingBuffer<T>  extends AbstractBoundedQueue<T>{
      */
     public T peek() {
         // TODO: Return the first item. None of your instance variables should change.
+        if(isEmpty()){
+            throw new RuntimeException("Ring buffer underflow");
+        }
         return rb[first];
     }
 
