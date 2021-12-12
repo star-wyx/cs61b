@@ -32,7 +32,17 @@ public class Game {
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
 
-        TETile[][] finalWorldFrame = null;
+        ter.initialize(WIDTH, HEIGHT);
+
+        Room a = new Room(0,0,12,12);
+        Frame frame = new Frame(WIDTH,HEIGHT);
+        frame.buildRooms();
+//        frame.vertical(12,0,6);
+//        frame.horizon(14,0,4);
+//        frame.breakWall();
+        TETile[][] finalWorldFrame = frame.getWorld();
+
+        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
 }
