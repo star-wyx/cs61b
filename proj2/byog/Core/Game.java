@@ -36,10 +36,10 @@ public class Game {
 
         Room a = new Room(0,0,12,12);
         Frame frame = new Frame(WIDTH,HEIGHT);
-        frame.buildRooms();
-//        frame.vertical(12,0,6);
-//        frame.horizon(14,0,4);
-//        frame.breakWall();
+        frame.buildMap();
+//        frame.buildMap();
+//        frame.buildMap();
+//        frame.buildMap();
         TETile[][] finalWorldFrame = frame.getWorld();
 
         ter.renderFrame(finalWorldFrame);

@@ -11,8 +11,6 @@ public class Frame {
     private final int WIDTH;
     private final int HEIGHT;
     private final TETile[][] world;
-    private LinkedList<Room> list;
-
     private static final long SEED = 2873123;
     private static final Random RANDOM = new Random(SEED);
 
@@ -20,7 +18,6 @@ public class Frame {
         this.WIDTH = WIDTH;
         this.HEIGHT = HEIGHT;
         world = new TETile[WIDTH][HEIGHT];
-        list = new LinkedList<>();
         initial();
     }
 
@@ -36,80 +33,140 @@ public class Frame {
         }
     }
 
-    public void buildRooms() {
-        while (list.size() < 20) {
-            int x1 = RANDOM.nextInt(WIDTH);
-            int y1 = RANDOM.nextInt(HEIGHT);
-            int addx = RANDOM.nextInt(5) + 3;
-            int addy = RANDOM.nextInt(5) + 9;
-            if (x1 + addx >= WIDTH || y1 + addy >= HEIGHT)
-                continue;
-            buildRoom(new Room(x1, y1, x1 + addx, y1 + addy));
-        }
-        for (Room r : list) {
-            System.out.println(r);
-        }
+    public void buildMap() {
+        int[] start = new int[2];
+        int[] end;
+        int[] entry;
+        start[0] = RANDOM.nextInt(WIDTH - 3);
+        start[1] = RANDOM.nextInt(HEIGHT - 3);
+        end = dotEnd(start);
+        buildRoom(start, end);
+        entry = dotEntry(start, end);
+        buildHallway(entry);
+        world[entry[0]][entry[1]] = Tileset.FLOWER;
     }
 
-    public void buildRoom(Room room) {
-        if (list != null) {
-            for (Room r : list) {
-                if (room.isOverlap(r))
-                    return;
+    /**
+     * @param start the left & down dot
+     * @return the random right & up dot
+     */
+    public int[] dotEnd(int[] start) {
+        int[] res = new int[]{-1, -1};
+        while (res[0] == -1 || res[0] >= WIDTH)
+            res[0] = RANDOM.nextInt(5) + start[0] + 3;
+        while (res[1] == -1 || res[1] >= HEIGHT)
+            res[1] = RANDOM.nextInt(8) + start[1] + 3;
+        while (!isNothing(start, res)) {
+            res = dotEnd(start);
+        }
+        return res;
+    }
+
+    /**
+     * @return the random entry dot for Hallway in a room.
+     */
+    public int[] dotEntry(int[] start, int[] end) {
+        int[] res = new int[3];
+        int direction = RANDOM.nextInt(4);
+        res[2] = direction;
+        if (direction == 0 && end[1] == HEIGHT - 1) {
+            direction = 1;
+        } else if (direction == 1 && start[1] == 0) {
+            direction = 0;
+        } else if (direction == 2 && start[0] == 0) {
+            direction = 3;
+        } else if (direction == 3 && end[0] == WIDTH - 1) {
+            direction = 2;
+        }
+
+        if (direction == 0) { //up
+            res[0] = RANDOM.nextInt(end[0] - start[0] - 1) + start[0] + 1;
+            res[1] = end[1];
+        } else if (direction == 1) { //down
+            res[0] = RANDOM.nextInt(end[0] - start[0] - 1) + start[0] + 1;
+            res[1] = start[1];
+        } else if (direction == 2) { //left
+            res[0] = start[0];
+            res[1] = RANDOM.nextInt(end[1] - start[1] - 1) + start[1] + 1;
+        } else { //right
+            res[0] = end[0];
+            res[1] = RANDOM.nextInt(end[1] - start[1] - 1) + start[1] + 1;
+        }
+        return res;
+    }
+
+    /**
+     * Check if there is all empty in the given area.
+     */
+    public boolean isNothing(int[] start, int[] end) {
+        for (int i = start[0]; i <= end[0]; i++) {
+            for (int j = start[1]; j <= end[1]; j++) {
+                if (world[i][j] != Tileset.NOTHING)
+                    return false;
             }
         }
-        for (int i = room.x1; i <= room.x2; i++) {
-            for (int j = room.y1; j <= room.y2; j++) {
-                if (i == room.x1 || i == room.x2 || j == room.y1 || j == room.y2)
+        return true;
+    }
+
+    public void buildRoom(int[] start, int[] end) {
+        for (int i = start[0]; i <= end[0]; i++) {
+            for (int j = start[1]; j <= end[1]; j++) {
+                if (i == start[0] || i == end[0] || j == start[1] || j == end[1])
                     world[i][j] = Tileset.WALL;
                 else
                     world[i][j] = Tileset.FLOOR;
             }
         }
-        list.add(room);
-//        buildHallway(room);
     }
 
-    public int[] buildHallway(Room r) {
-        int x = r.x2;
-        int y = RANDOM.nextInt(r.y2 - r.y1 - 2) + r.y1 + 1;
-        int length = RANDOM.nextInt(4) + 5;
-        horizon(x, y, length);
-        return new int[]{x,y};
+    public int[] buildHallway(int[] entry) {
+        int length = RANDOM.nextInt(10) + 3;
+
+        if (entry[2] == 0) {
+            goUp(entry, length);
+        } else if (entry[2] == 1) {
+            goDown(entry, length);
+        } else if (entry[2] == 2) {
+            goLeft(entry, length);
+        } else if (entry[2] == 3) {
+            goRight(entry, length);
+        }
+        return null;
     }
 
-    public void vertical(int x, int y, int length) {
-        for (int i = x; i <= x + 2; i++) {
-            for (int j = y; j <= y + length; j++) {
-                if (i == x || i == x + 2 || j == y || j == y + length)
-                    world[i][j] = Tileset.WALL;
-                else
-                    world[i][j] = Tileset.FLOOR;
-            }
+    public void goUp(int[] entry, int length) {
+        int x = entry[0];
+        for (int j = entry[1]; j < entry[1] + length; j++) {
+            world[x][j] = Tileset.FLOOR;
+            world[x - 1][j] = Tileset.WALL;
+            world[x + 1][j] = Tileset.WALL;
         }
     }
 
-    public void horizon(int x, int y, int length) {
-        for (int i = x; i <= x + length; i++) {
-            for (int j = y; j <= y + 2; j++) {
-                if (i == x || i == x + length || j == y || j == y + 2)
-                    world[i][j] = Tileset.WALL;
-                else
-                    world[i][j] = Tileset.FLOOR;
-            }
+    public void goDown(int[] entry, int length) {
+        int x = entry[0];
+        for (int j = entry[1] - length + 1; j <= entry[1]; j++) {
+            world[x][j] = Tileset.FLOOR;
+            world[x - 1][j] = Tileset.WALL;
+            world[x + 1][j] = Tileset.WALL;
         }
     }
 
-    public void breakWall() {
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
-                if (world[i][j] == Tileset.WALL) {
-                    if (i - 1 >= 0 && i + 1 < WIDTH && world[i - 1][j] == Tileset.FLOOR && world[i + 1][j] == Tileset.FLOOR)
-                        world[i][j] = Tileset.FLOOR;
-                    if (j - 1 >= 0 && j + 1 < HEIGHT && world[i][j - 1] == Tileset.FLOOR && world[i][j + 1] == Tileset.FLOOR)
-                        world[i][j] = Tileset.FLOOR;
-                }
-            }
+    public void goLeft(int[] entry, int length) {
+        int y = entry[1];
+        for (int i = entry[0] - length + 1; i <= entry[0]; i++) {
+            world[i][y] = Tileset.FLOOR;
+            world[i][y - 1] = Tileset.WALL;
+            world[i][y + 1] = Tileset.WALL;
+        }
+    }
+
+    public void goRight(int[] entry, int length) {
+        int y = entry[1];
+        for (int i = entry[0]; i < entry[0] + length; i++) {
+            world[i][y] = Tileset.FLOOR;
+            world[i][y - 1] = Tileset.WALL;
+            world[i][y + 1] = Tileset.WALL;
         }
     }
 
