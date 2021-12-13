@@ -14,6 +14,9 @@ public class Percolation {
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
+        if (N <= 0) {
+            throw new IllegalArgumentException();
+        }
         this.N = N;
         map = new WeightedQuickUnionUF(N * N);
         grid = new boolean[N][N];
@@ -49,12 +52,13 @@ public class Percolation {
             map.union(num, xyTo1D(row, col - 1));
         }
         if (col < N - 1 && isOpen(row, col + 1)) {
-            map.union(num,xyTo1D(row, col + 1));
+            map.union(num, xyTo1D(row, col + 1));
         }
         openSites++;
         if (row == 0) {
             topOpen.add(num);
-        } else if (row == N - 1) {
+        }
+        if (row == N - 1) {
             downOpen.add(num);
         }
     }
@@ -71,8 +75,9 @@ public class Percolation {
         }
         int num = xyTo1D(row, col);
         for (Integer i : topOpen) {
-            if (map.connected(num, i))
+            if (map.connected(num, i)) {
                 return true;
+            }
         }
         return false;
     }
@@ -88,15 +93,22 @@ public class Percolation {
             return false;
         }
         for (Integer down : downOpen) {
-            if(isFull(down / N, down % N))
-                return true;
+            for (Integer top : topOpen) {
+                if (map.connected(down, top)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
     // use for unit testing (not required)
     public static void main(String[] args) {
-
+        Percolation p = new Percolation(2);
+        p.open(0, 0);
+        p.open(1, 1);
+        p.open(0, 1);
+        System.out.println(p.percolates());
     }
 
 }
