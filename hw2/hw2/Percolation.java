@@ -7,9 +7,9 @@ public class Percolation {
     private final WeightedQuickUnionUF map;
     private final int N;
     private int openSites;
-    boolean[] connectTop;
-    boolean[] connectDown;
-    boolean isPercolate;
+    private final boolean[] connectTop;
+    private final boolean[] connectDown;
+    private final boolean isPercolate;
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
