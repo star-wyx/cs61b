@@ -2,15 +2,14 @@ package hw2;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-import java.util.LinkedList;
-
 public class Percolation {
-    private boolean[][] grid;
-    private WeightedQuickUnionUF map;
-    private int N;
+    private final boolean[][] grid;
+    private final WeightedQuickUnionUF map;
+    private final int N;
     private int openSites;
-    private LinkedList<Integer> topOpen;
-    private LinkedList<Integer> downOpen;
+    boolean[] connectTop;
+    boolean[] connectDown;
+    boolean isPercolate;
 
     // create N-by-N grid, with all sites initially blocked
     public Percolation(int N) {
@@ -20,14 +19,10 @@ public class Percolation {
         this.N = N;
         map = new WeightedQuickUnionUF(N * N);
         grid = new boolean[N][N];
-        for (boolean[] row : grid) {
-            for (boolean b : row) {
-                b = false;
-            }
-        }
         openSites = 0;
-        topOpen = new LinkedList<>();
-        downOpen = new LinkedList<>();
+        connectTop = new boolean[N * N];
+        connectDown = new boolean[N * N];
+        isPercolate = false;
     }
 
     // convert the xy to an integer
@@ -42,24 +37,55 @@ public class Percolation {
             return;
         }
         grid[row][col] = true;
+        boolean top = false;
+        boolean down = false;
         if (row > 0 && isOpen(row - 1, col)) {
+            if (connectTop[map.find(xyTo1D(row - 1, col))] || connectTop[map.find(num)]) {
+                top = true;
+            }
+            if (connectDown[map.find(xyTo1D(row - 1, col))] || connectDown[map.find(num)]) {
+                down = true;
+            }
             map.union(num, xyTo1D(row - 1, col));
         }
         if (row < N - 1 && isOpen(row + 1, col)) {
+            if (connectTop[map.find(xyTo1D(row + 1, col))] || connectTop[map.find(num)]) {
+                top = true;
+            }
+            if (connectDown[map.find(xyTo1D(row + 1, col))] || connectDown[map.find(num)]) {
+                down = true;
+            }
             map.union(num, xyTo1D(row + 1, col));
         }
         if (col > 0 && isOpen(row, col - 1)) {
+            if (connectTop[map.find(xyTo1D(row, col - 1))] || connectTop[map.find(num)]) {
+                top = true;
+            }
+            if (connectDown[map.find(xyTo1D(row, col - 1))] || connectDown[map.find(num)]) {
+                down = true;
+            }
             map.union(num, xyTo1D(row, col - 1));
         }
         if (col < N - 1 && isOpen(row, col + 1)) {
+            if (connectTop[map.find(xyTo1D(row, col + 1))] || connectTop[map.find(num)]) {
+                top = true;
+            }
+            if (connectDown[map.find(xyTo1D(row, col + 1))] || connectDown[map.find(num)]) {
+                down = true;
+            }
             map.union(num, xyTo1D(row, col + 1));
         }
         openSites++;
         if (row == 0) {
-            topOpen.add(num);
+            top = true;
         }
         if (row == N - 1) {
-            downOpen.add(num);
+            down = true;
+        }
+        connectTop[map.find(num)] = top;
+        connectDown[map.find((num))] = down;
+        if (top && down) {
+            isPercolate = true;
         }
     }
 
@@ -70,16 +96,7 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if (topOpen == null) {
-            return false;
-        }
-        int num = xyTo1D(row, col);
-        for (Integer i : topOpen) {
-            if (map.connected(num, i)) {
-                return true;
-            }
-        }
-        return false;
+        return connectTop[map.find(xyTo1D(row, col))];
     }
 
     // number of open sites
@@ -89,25 +106,18 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        if (downOpen == null) {
-            return false;
-        }
-        for (Integer down : downOpen) {
-            for (Integer top : topOpen) {
-                if (map.connected(down, top)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return isPercolate;
     }
 
     // use for unit testing (not required)
     public static void main(String[] args) {
         Percolation p = new Percolation(2);
         p.open(0, 0);
+        System.out.println("0,0" + p.isFull(0, 0));
         p.open(1, 1);
+        System.out.println("0,0" + p.isFull(1, 1));
         p.open(0, 1);
+        System.out.println("0,0" + p.isFull(0, 1));
         System.out.println(p.percolates());
     }
 
