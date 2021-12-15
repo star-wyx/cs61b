@@ -124,31 +124,11 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         // Throws an exception if index is invalid. DON'T CHANGE THIS LINE.
         validateSinkSwimArg(index);
 
-        int left = leftIndex(index);
-        int right = rightIndex(index);
-        if (left > size && right > size) {
-            return;
-        } else if (right > size) {
-            if (contents[index].priority() > contents[left].priority()) {
-                swap(index, left);
-            }
-            return;
-        } else if (left > size) {
-            if (contents[index].priority() > contents[left].priority()) {
-                swap(index, left);
-            }
-            return;
-        }
-
-        if (contents[index].priority() > contents[left].priority()
-                || contents[index].priority() > contents[right].priority()) {
-            if (contents[left].priority() < contents[right].priority()) {
-                swap(index, left);
-                sink(left);
-            } else {
-                swap(index, right);
-                sink(right);
-            }
+        int min = min(leftIndex(index), rightIndex(index));
+        while (inBounds(min) && contents[min].priority() < contents[index].priority()) {
+            swap(index,min);
+            index = min;
+            min = min(leftIndex(index),rightIndex(index));
         }
     }
 
@@ -163,7 +143,6 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             resize(contents.length * 2);
         }
 
-
         size++;
         contents[size] = new Node(item, priority);
         swim(size);
@@ -175,7 +154,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     @Override
     public T peek() {
-
+        if (size <= 0) {
+            return null;
+        }
         return contents[1].myItem;
     }
 
@@ -190,13 +171,18 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     @Override
     public T removeMin() {
-
+        if (size == 0) {
+            return null;
+        }
         int last = size;
         T res = contents[1].myItem;
         Node l = contents[last];
         contents[last] = null;
         contents[1] = l;
         size--;
+        if (size == 0) {
+            return res;
+        }
         sink(1);
         return res;
     }
