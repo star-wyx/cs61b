@@ -2,6 +2,7 @@ package lab11.graphs;
 
 import edu.princeton.cs.algs4.In;
 
+import javax.xml.soap.Node;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -15,25 +16,8 @@ public class MazeAStarPath extends MazeExplorer {
     private Maze maze;
     private int targetX;
     private int targetY;
-    private boolean isTargetFound;
-    private PriorityQueue<Node> pq;
-
-    private class Node {
-        public int v;
-        public int priority;
-
-        public Node(int v, int distance) {
-            this.v = v;
-            this.priority = distance + h(v);
-        }
-    }
-
-    private class NodeCompare implements Comparator<Node> {
-        @Override
-        public int compare(Node o1, Node o2) {
-            return o1.priority - o2.priority;
-        }
-    }
+    private PriorityQueue<Integer> pq;
+    private Comparator<Integer> cmp;
 
     public MazeAStarPath(Maze m, int sourceX, int sourceY, int targetX, int targetY) {
         super(m);
@@ -44,7 +28,19 @@ public class MazeAStarPath extends MazeExplorer {
         this.targetY = targetY;
         distTo[s] = 0;
         edgeTo[s] = s;
-        pq = new PriorityQueue<>(new NodeCompare());
+        cmp = new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                if (h(o1) + distTo[o1] < h(o2) + distTo[o2]) {
+                    return -1;
+                } else if (h(o1) + distTo[o1] == h(o2) + distTo[o2]) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        };
+        pq = new PriorityQueue<>(cmp);
     }
 
     /**
@@ -72,30 +68,24 @@ public class MazeAStarPath extends MazeExplorer {
         marked[s] = true;
         distTo[s] = 0;
         announce();
-        dfs(s);
-    }
-
-    private void dfs(int v) {
-        if (v == t) {
-            isTargetFound = true;
-            return;
-        }
-
-        for (int tmp : maze.adj(v)) {
-            if (!marked[tmp]) {
-                distTo[tmp] = distTo[v] + 1;
-                edgeTo[tmp] = v;
-                marked[tmp] = true;
-                announce();
-                pq.add(new Node(tmp, distTo[tmp]));
-            }
-        }
-
-        while (pq.size() != 0) {
-            Node tmp = pq.poll();
-            dfs(tmp.v);
-            if (isTargetFound) {
-                return;
+        pq.add(s);
+        while (pq != null) {
+            int v = pq.poll();
+            for (int tmp : maze.adj(v)) {
+                if (!marked[tmp]) {
+                    distTo[tmp] = distTo[v] + 1;
+                    edgeTo[tmp] = v;
+                    marked[tmp] = true;
+                    announce();
+                    pq.add(tmp);
+                } else {
+                    if (distTo[tmp] > distTo[v] + 1) {
+                        distTo[tmp] = distTo[v] + 1;
+                    }
+                }
+                if(tmp == t){
+                    return;
+                }
             }
         }
     }
