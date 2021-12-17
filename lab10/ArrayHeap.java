@@ -456,8 +456,4 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             i += 1;
         }
     }
-
-    public static void main(String[] args) {
-
-    }
 }
