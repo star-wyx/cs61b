@@ -93,9 +93,9 @@ public class Board implements WorldState {
                     continue;
                 }
                 if (tiles[i][j] != i * N + j + 1) {
-                    int x = tiles[i][j] / N;
-                    int y = tiles[i][j] % N - 1;
-                    res += Math.abs(x + y - i - j);
+                    int x = (tiles[i][j]-1) / N;
+                    int y = (tiles[i][j]-1) % N;
+                    res += Math.abs(x - i) + Math.abs(y - j);
                 }
             }
         }
@@ -108,6 +108,9 @@ public class Board implements WorldState {
     }
 
     public boolean equals(Object y) {
+        if(y == null){
+            return false;
+        }
         if (this == y) {
             return true;
         }
@@ -146,4 +149,8 @@ public class Board implements WorldState {
         return s.toString();
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
