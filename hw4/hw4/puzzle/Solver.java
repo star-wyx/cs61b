@@ -45,6 +45,7 @@ public class Solver {
     private Node last;
     private Set<WorldState> set;
     private Map<Node, Integer> map;
+    LinkedList<WorldState> res;
 
     public Solver(WorldState initial) {
         pq = new MinPQ<>();
@@ -68,20 +69,21 @@ public class Solver {
                 }
             }
         }
-    }
 
-    public int moves() {
-        return last.move;
-    }
-
-    public Iterable<WorldState> solution() {
-        LinkedList<WorldState> res = new LinkedList<>();
+        res = new LinkedList<>();
         Node tmp = last;
         while (tmp.pre != null) {
             res.addFirst(tmp.world);
             tmp = tmp.pre;
         }
         res.addFirst(tmp.world);
+    }
+
+    public int moves() {
+        return res.size();
+    }
+
+    public Iterable<WorldState> solution() {
         return res;
     }
 }
