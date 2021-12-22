@@ -73,7 +73,7 @@ public class MergeSort {
             Queue<Item> items) {
         // Your code here!
         int length = items.size();
-        if(length == 1){
+        if(length == 1 || length == 0){
             return items;
         }
         Queue<Item> second = new Queue<>();
